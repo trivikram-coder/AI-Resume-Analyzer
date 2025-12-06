@@ -13,7 +13,7 @@ public class AiResumeServerApplication {
 	}
 	@GetMapping
 	public String health(){
-		return "Server running successfully 🚀🚀🚀";
+		return "Server running successfully done 🚀🚀🚀";
 	}
 
 }
