@@ -17,7 +17,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http){
         http.csrf(csrf->csrf.disable())
                 .authorizeHttpRequests(auth->
-                        auth.requestMatchers("/api/**","/account/**")
+                        auth.requestMatchers("/health/**","/api/**","/account/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

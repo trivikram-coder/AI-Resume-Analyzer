@@ -47,7 +47,7 @@ public class ResumeReportController {
     }
     @GetMapping("/report/{email}")
     public ResponseEntity<?> getResumeReport(@PathVariable String email){
-        System.out.println(accountRepo.existsByEmail(email)+" "+email);
+
         if(!accountRepo.existsByEmail(email)){
             return ResponseEntity.badRequest().body(Map.of("response","No report exists with this email"));
         }
