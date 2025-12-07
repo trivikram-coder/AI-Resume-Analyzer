@@ -1,21 +1,29 @@
 package com.example.ai_resume_server.service;
 
+import com.example.ai_resume_server.config.SecurityConfig;
 import com.example.ai_resume_server.models.Account;
 import com.example.ai_resume_server.repo.AccountRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AccountService {
     @Autowired
     private AccountRepo repo;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Account register(Account account){
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         return repo.save(account);
     }
     public boolean login(Account account){
         Account details=repo.findByEmail(account.getEmail());
-        return (details.getEmail().equals(account.getEmail()))&&(details.getPassword().equals(account.getPassword()));
+        boolean validEmail=details.getEmail().equals(account.getEmail());
+        String hashedPass=details.getPassword();
+        boolean validPass=passwordEncoder.matches(account.getPassword(),hashedPass);
+        return validEmail&&validPass;
     }
     public Account getUserByEmail(String email){
         return repo.findByEmail(email);

@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowCredentials(true)
                 .allowedMethods("GET","POST","PUT","DELETE")
-                .allowedOrigins("http://localhost:573")
+                .allowedOrigins("http://localhost:573","http://localhost:63342/Ai-Resume-Analyzer/ai-resume-server/static/index.html?_ijt=fca4s748v865209lfmb70rhs6v&_ij_reload=RELOAD_ON_SAVE")
                 .allowedHeaders("*");
     }
 }

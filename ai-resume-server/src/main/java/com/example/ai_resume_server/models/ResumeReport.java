@@ -16,6 +16,7 @@ public class ResumeReport {
     private String JOB_MATCH;
     private String MISSING_KEYWORDS;
     private String SUMMARY;
+    @Column(unique = true)
     private String email;
 
     public void setMessage(String data) {

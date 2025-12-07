@@ -42,9 +42,6 @@ public class AccountController {
     @GetMapping("/read")
     public ResponseEntity<?> getUser(@RequestParam("email") String email){
         try{
-            if(email.isEmpty()){
-                System.out.println("Empty");
-            }
             if(!repo.existsByEmail(email)){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("response","Email id not exists"));
             }
