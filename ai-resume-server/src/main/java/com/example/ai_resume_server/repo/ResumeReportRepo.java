@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ResumeReportRepo extends JpaRepository<ResumeReport,Long> {
-    Optional<List<ResumeReport>> findByEmailOrderByResumeIdDesc(String email);
+    Optional<List<ResumeReport>> findByEmailOrderByIdDesc(String email);
 }

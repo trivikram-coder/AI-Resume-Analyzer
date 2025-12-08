@@ -9,8 +9,8 @@ import lombok.Data;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
-    private String username;
+    private Long id;
+    private String userName;
     @Column(unique = true)
     private String email;
     private String password;

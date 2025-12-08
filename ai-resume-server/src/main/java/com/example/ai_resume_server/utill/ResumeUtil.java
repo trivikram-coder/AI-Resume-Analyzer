@@ -44,13 +44,13 @@ public class ResumeUtil {
             return response;
         }
 
-        response.setATS_SCORE(m.group(1).trim());
-        response.setSTRENGTHS(List.of(m.group(2).trim().split(",")));
-        response.setIMPROVEMENTS(m.group(3).trim());
-        response.setJOB_MATCH(m.group(4).trim());
-        response.setJOB_RECOMMENDATION(List.of(m.group(5).trim().split(",")));
-        response.setMISSING_KEYWORDS(List.of(m.group(6).trim().split(",")));
-        response.setSUMMARY(m.group(7).trim());
+        response.setAtsScore(Long.parseLong(m.group(1).trim()));
+        response.setStrengths(List.of(m.group(2).trim().split(",")));
+        response.setImprovements(List.of(m.group(3).trim().split(",")));
+        response.setJobMatch(Long.parseLong(m.group(4).trim()));
+        response.setJobRecommendation(List.of(m.group(5).trim().split(",")));
+        response.setMissingKeywords(List.of(m.group(6).trim().split(",")));
+        response.setSummary(m.group(7).trim());
 
 
 

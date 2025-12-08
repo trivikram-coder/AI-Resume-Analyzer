@@ -20,48 +20,48 @@ public class AccountController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody Account account){
         if(repo.existsByEmail(account.getEmail())){
-            return ResponseEntity.badRequest().body(Map.of("response","Email already existed"));
+            return ResponseEntity.badRequest().body(Map.of("status",false,"message","Email already existed"));
 
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("response","Registered successfully","account",service.register(account)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("status",true,"message","Registered successfully","account",service.register(account)));
     }
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Account account){
         if(!repo.existsByEmail(account.getEmail())){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("response","Email id not exists"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status",false,"message","Email id not exists"));
         }
         if(account.getEmail().isEmpty()||account.getPassword().isEmpty()){
-            return ResponseEntity.badRequest().body(Map.of("response","Please provide email and password"));
+            return ResponseEntity.badRequest().body(Map.of("status",false,"message","Please provide email and password"));
         }
         boolean isValid= service.login(account);
         if(!isValid){
-            return ResponseEntity.badRequest().body(Map.of("response","Invalid credentials"));
+            return ResponseEntity.badRequest().body(Map.of("status",false,"message","Invalid credentials"));
         }
-        return ResponseEntity.ok().body(Map.of("response","Login successfully"));
+        return ResponseEntity.ok().body(Map.of("status",true,"message","Login successfully"));
     }
     @GetMapping("/read")
     public ResponseEntity<?> getUser(@RequestParam("email") String email){
         try{
             if(!repo.existsByEmail(email)){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("response","Email id not exists"));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status",false,"message","Email id not exists"));
             }
             if(email.isEmpty()){
-                return ResponseEntity.badRequest().body(Map.of("response","Email id is required"));
+                return ResponseEntity.badRequest().body(Map.of("status",false,"message","Email id is required"));
             }
             Account user=service.getUserByEmail(email);
-            return ResponseEntity.ok(Map.of("response",user));
+            return ResponseEntity.ok(Map.of("status",true,"message",user));
         }
         catch(Exception e){
-            return ResponseEntity.internalServerError().body(Map.of("response",e.getMessage()==null?"Server is not responding":""));
+            return ResponseEntity.internalServerError().body(Map.of("status",false,"message",e.getMessage()==null?"Server is not responding":""));
         }
 
     }
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestParam("email") String email,@RequestBody Account updatedAccount){
         if(!repo.existsByEmail(email)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("response","Email id not exists"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status",false,"message","Email id not exists"));
         }
         Account account=service.updateUser(email,updatedAccount);
-        return ResponseEntity.ok(Map.of("response","User updated","updatedAccount",account));
+        return ResponseEntity.ok(Map.of("status",true,"message","User updated","updatedAccount",account));
     }
 }

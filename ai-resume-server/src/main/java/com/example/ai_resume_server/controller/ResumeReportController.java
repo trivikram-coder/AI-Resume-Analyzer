@@ -1,6 +1,5 @@
 package com.example.ai_resume_server.controller;
 
-
 import com.example.ai_resume_server.models.ResumeReport;
 import com.example.ai_resume_server.repo.AccountRepo;
 import com.example.ai_resume_server.repo.ResumeReportRepo;
@@ -20,41 +19,105 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/resume")
 public class ResumeReportController {
+
     @Autowired
     private AccountRepo accountRepo;
+
     @Autowired
-    private PDFValidatorService service;
+    private PDFValidatorService validatorService;
+
     @Autowired
-    private ResumeReportRepo repo;
+    private ResumeReportRepo reportRepo;
+
     @Autowired
     private ResumeReportService resumeService;
+
     @Autowired
-
     private PDFExtractService pdfExtractService;
-    @PostMapping("/upload/{email}")
-    public ResponseEntity<?> uploadResume(@RequestParam("file")MultipartFile file,@RequestParam("description") String description,@PathVariable String email){
-        if(!accountRepo.existsByEmail(email)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("response","Please register to generate the report"));
-        }
-        String validate= service.validate(file);
-        if(!validate.equals("VALID")) {
-        return ResponseEntity.badRequest().body(Map.of("error",validate));
-        }
-        ResumeReport report=pdfExtractService.extractText(file,description);
-        if(report==null){
-            return ResponseEntity.badRequest().body(Map.of("response","Unable to generate your resume report"));
-        }
-        report.setEmail(email);
-        repo.save(report);
-        return ResponseEntity.ok(Map.of("response","Report generated successfully"));
-    }
-    @GetMapping("/report/{email}")
-    public ResponseEntity<?> getResumeReport(@PathVariable String email){
 
-        if(!accountRepo.existsByEmail(email)){
-            return ResponseEntity.badRequest().body(Map.of("response","No report exists with this email"));
+
+    // -------------------- Upload Resume --------------------
+    @PostMapping("/upload/{email}")
+    public ResponseEntity<?> uploadResume(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("description") String description,
+            @PathVariable String email) {
+
+        if (!accountRepo.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "status", false,
+                            "message", "Email not registered. Please register to generate a report."
+                    ));
         }
-        Optional<List<ResumeReport>> report=resumeService.getReport(email);
-        return ResponseEntity.ok().body(Map.of("response",report));
+
+        String validationResult = validatorService.validate(file);
+        if (!validationResult.equals("VALID")) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "status", false,
+                            "message", validationResult
+                    ));
+        }
+
+        ResumeReport report = pdfExtractService.extractText(file, description);
+
+        if (report == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "status", false,
+                            "message", "Unable to generate resume report. Please try again."
+                    ));
+        }
+
+        report.setEmail(email);
+        reportRepo.save(report);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of(
+                        "status", true,
+                        "message", "Resume report generated successfully",
+                        "reportId", report.getId()
+                ));
+    }
+
+
+    // -------------------- Get Resume Reports --------------------
+    @GetMapping("/report/{email}")
+    public ResponseEntity<?> getResumeReport(@PathVariable String email) {
+
+        if (email.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "status", false,
+                            "message", "Email is required"
+                    ));
+        }
+
+        if (!accountRepo.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "status", false,
+                            "message", "No account found with this email"
+                    ));
+        }
+
+        Optional<List<ResumeReport>> reports = resumeService.getReport(email);
+
+        if (reports.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "status", false,
+                            "message", "No resume reports found for this email"
+                    ));
+        }
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "status", true,
+                        "message", "Reports fetched successfully",
+                        "reports", reports
+                )
+        );
     }
 }

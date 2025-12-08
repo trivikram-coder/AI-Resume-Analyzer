@@ -42,6 +42,6 @@ public class ResumeReportService {
         }
     }
     public Optional<List<ResumeReport>> getReport(String email){
-        return repo.findByEmailOrderByResumeIdDesc(email);
+        return repo.findByEmailOrderByIdDesc(email);
     }
 }

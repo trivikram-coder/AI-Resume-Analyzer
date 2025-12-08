@@ -34,9 +34,9 @@ public class AccountService {
 
         acc.setEmail(updatedAccount.getEmail());
         }
-        if(updatedAccount.getUsername()!=null){
+        if(updatedAccount.getUserName()!=null){
 
-        acc.setUsername(updatedAccount.getUsername());
+        acc.setUserName(updatedAccount.getUserName());
         }
         if(updatedAccount.getPassword()!=null){
             acc.setPassword(updatedAccount.getPassword());

@@ -36,7 +36,7 @@ public class PDFExtractService {
                     "You are an ATS resume analyzer. " +
                             "The job description is: " + description + ". " +
                             "When I provide resume text, you must respond ONLY in the following fixed sentence format: " +
-                            "ATS_SCORE: <score>; STRENGTHS: <comma separated strengths>; IMPROVEMENTS: <comma separated improvements>; JOB_MATCH: <percentage>;JOB_RECOMMENDATION:<comma separated jobs>; MISSING_KEYWORDS: <comma separated keywords>; SUMMARY: <one sentence final summary>. " +
+                            "ATS_SCORE: <score>; STRENGTHS: <comma separated strengths>; IMPROVEMENTS: <comma separated improvements>; JOB_MATCH: <score>;JOB_RECOMMENDATION:<comma separated jobs>; MISSING_KEYWORDS: <comma separated keywords>; SUMMARY: <one sentence final summary>. " +
                             "Strict rules: " +
                             "- Do NOT use JSON. " +
                             "- Do NOT use bullet points. " +
@@ -45,7 +45,7 @@ public class PDFExtractService {
                             "- Do NOT include new lines or formatting. " +
                             "- Do NOT change keyword labels (ATS_SCORE, STRENGTHS, IMPROVEMENTS, JOB_MATCH, MISSING_KEYWORDS, SUMMARY). " +
                             "- Replace only the values. " +
-                            "Example: ATS_SCORE: 70; STRENGTHS: good Java skills, strong projects; IMPROVEMENTS: add measurable achievements; JOB_MATCH: 65%;JOB_RECOMMENDATION:Java Developer,Backend Developer; MISSING_KEYWORDS: spring boot, rest api; SUMMARY: candidate has solid fundamentals but needs more project depth. ";
+                            "Example: ATS_SCORE: 70; STRENGTHS: good Java skills, strong projects; IMPROVEMENTS: add measurable achievements; JOB_MATCH: 65;JOB_RECOMMENDATION:Java Developer,Backend Developer; MISSING_KEYWORDS: spring boot, rest api; SUMMARY: candidate has solid fundamentals but needs more project depth. ";
 
             // Final prompt = rules + extracted resume text
 
