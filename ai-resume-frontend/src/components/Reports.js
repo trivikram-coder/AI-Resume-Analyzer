@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { getReports, deleteReport } from "../api/api";
 
+function titleCase(str) {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export default function Reports() {
   const email = localStorage.getItem("email");
   const [reports, setReports] = useState([]);
@@ -42,23 +49,80 @@ export default function Reports() {
       ) : (
         <div className="report-grid">
           {reports.map((r) => (
-            <article className="report-card" key={r.id}>
+            <article className="report-card styled" key={r.id}>
+              
+              {/* HEADER */}
               <div className="report-meta">
-                <span className="pill" style={{ background: "rgba(139,92,246,0.12)", borderColor: "rgba(139,92,246,0.35)", color: "#c4b5fd" }}>
-                  Target role
-                </span>
+                <span className="pill purple">AI Report</span>
                 <button className="btn btn-secondary" onClick={() => remove(r.id)}>
                   Delete
                 </button>
               </div>
-              <div>
-                <p className="muted" style={{ margin: "0 0 6px 0" }}>Description</p>
-                <div className="report-text">{r.description}</div>
+
+              {/* SUMMARY */}
+              <div className="section">
+                <p className="muted">Summary</p>
+                <div className="content">{r.summary}</div>
               </div>
-              <div>
-                <p className="muted" style={{ margin: "0 0 6px 0" }}>Report</p>
-                <div className="report-text">{r.generatedText}</div>
+
+              {/* ATS SCORE */}
+              <div className="section">
+                <p className="muted">ATS Score</p>
+                <div className="bar-container">
+                  <div className="bar-fill" style={{ width: `${r.atsScore}%` }}></div>
+                </div>
+                <p className="bar-value">{r.atsScore}%</p>
               </div>
+
+              {/* JOB MATCH */}
+              <div className="section">
+                <p className="muted">Job Match</p>
+                <div className="bar-container">
+                  <div className="bar-fill green" style={{ width: `${r.jobMatch}%` }}></div>
+                </div>
+                <p className="bar-value">{r.jobMatch}%</p>
+              </div>
+
+              {/* ROLES */}
+              <div className="section">
+                <p className="muted">Recommended Roles</p>
+                <ul className="list">
+                  {r.jobRecommendation?.map((j, i) => (
+                    <li key={i}>{titleCase(j)}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* STRENGTHS */}
+              <div className="section">
+                <p className="muted">Strengths</p>
+                <ul className="list">
+                  {r.strengths?.map((s, i) => (
+                    <li key={i}>{titleCase(s)}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* MISSING KEYWORDS */}
+              <div className="section">
+                <p className="muted">Missing Keywords</p>
+                <ul className="list">
+                  {r.missingKeywords?.map((k, i) => (
+                    <li key={i}>{titleCase(k)}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* IMPROVEMENTS */}
+              <div className="section">
+                <p className="muted">Improvements</p>
+                <ul className="list">
+                  {r.improvements?.map((imp, i) => (
+                    <li key={i}>{titleCase(imp)}</li>
+                  ))}
+                </ul>
+              </div>
+
             </article>
           ))}
         </div>

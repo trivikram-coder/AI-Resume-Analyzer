@@ -7,6 +7,7 @@ import com.example.ai_resume_server.service.PDFExtractService;
 import com.example.ai_resume_server.service.PDFValidatorService;
 import com.example.ai_resume_server.service.ResumeReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/resume")
 public class ResumeReportController {
-
+    @Autowired
+    private CacheManager cacheManager;
     @Autowired
     private AccountRepo accountRepo;
 
@@ -45,41 +47,41 @@ public class ResumeReportController {
 
         if (!accountRepo.existsByEmail(email)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                            "status", false,
-                            "message", "Email not registered. Please register to generate a report."
-                    ));
+                    .body(Map.of("status", false, "message", "Email not registered."));
         }
 
         String validationResult = validatorService.validate(file);
         if (!validationResult.equals("VALID")) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "status", false,
-                            "message", validationResult
-                    ));
+            return ResponseEntity.badRequest().body(
+                    Map.of("status", false, "message", validationResult)
+            );
         }
 
+        // Extract → send prompt → generate report
         ResumeReport report = pdfExtractService.extractText(file, description);
 
         if (report == null) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of(
-                            "status", false,
-                            "message", "Unable to generate resume report. Please try again."
-                    ));
+            return ResponseEntity.badRequest().body(
+                    Map.of("status", false, "message", "Unable to generate resume report.")
+            );
         }
 
+        // SET EMAIL HERE (the ONLY correct place)
         report.setEmail(email);
+
+        // SAVE REPORT
         reportRepo.save(report);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of(
-                        "status", true,
-                        "message", "Resume report generated successfully",
-                        "reportId", report.getId()
-                ));
+        // NOW CLEAR CACHE
+        if (cacheManager.getCache("resumeReport") != null) {
+            cacheManager.getCache("resumeReport").evict(email);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                Map.of("status", true, "message", "Resume report generated successfully", "reportId", report.getId())
+        );
     }
+
 
 
     // -------------------- Get Resume Reports --------------------
