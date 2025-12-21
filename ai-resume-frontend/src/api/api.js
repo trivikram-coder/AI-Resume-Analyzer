@@ -28,12 +28,29 @@ export async function uploadResume(email, file, description) {
 }
 
 export async function getReports(email) {
-  return fetch(`${BASE_URL}/api/resume/report/${email}`)
-    .then(res => res.json());
+  try {
+    const response = await fetch(`${BASE_URL}/api/resume/report/${email}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    return { status: false, message: error.message || "Failed to fetch reports" };
+  }
 }
 
 export async function deleteReport(id) {
-  return fetch(`${BASE_URL}/api/resume/delete/${id}`, {
-    method: "DELETE"
-  }).then(res => res.json());
+  try {
+    const response = await fetch(`${BASE_URL}/api/resume/delete/${id}`, {
+      method: "DELETE"
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error deleting report:", error);
+    return { status: false, message: error.message || "Failed to delete report" };
+  }
 }

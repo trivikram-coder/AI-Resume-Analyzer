@@ -32,63 +32,53 @@ export default function Login() {
   return (
     <section className="panel">
       <div className="panel-header">
-        <div>
-          <p className="pill">Welcome back</p>
-          <h1 className="panel-title">Sign in to your workspace</h1>
-          <p className="panel-subtitle">
-            Continue optimizing resumes, tracking reports, and sharing insights
-            with hiring managers.
-          </p>
-        </div>
+        <p className="pill">Welcome back</p>
+        <h1 className="panel-title">Sign in to your workspace</h1>
+        <p className="panel-subtitle">
+          Continue optimizing resumes, tracking reports, and sharing insights
+          with hiring managers.
+        </p>
         <div className="hint">
           New here?{" "}
-          <Link to="/register" className="nav-link nav-link--active" style={{ padding: "6px 10px" }}>
-            Create account
-          </Link>
+          <Link to="/register">Create account</Link>
         </div>
       </div>
 
-      <form className="grid-2" onSubmit={handleSubmit}>
-        <div className="input-group">
-          <label className="input-label">Work email</label>
-          <input
-            className="input-control"
-            type="email"
-            placeholder="you@company.com"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            required
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Password</label>
-          <input
-            className="input-control"
-            type="password"
-            placeholder="••••••••"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required
-          />
+      <form onSubmit={handleSubmit}>
+        <div className="grid-2">
+          <div className="input-group">
+            <label className="input-label">Work email</label>
+            <input
+              className="input-control"
+              type="email"
+              placeholder="you@company.com"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Password</label>
+            <input
+              className="input-control"
+              type="password"
+              placeholder="••••••••"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+            />
+          </div>
         </div>
 
-        <div className="actions" style={{ gridColumn: "1 / -1" }}>
+        <div className="actions">
           <button className="btn btn-primary" type="submit" disabled={loading}>
             {loading ? "Signing in..." : "Sign in"}
           </button>
           <p className="muted">Secure login to keep your resume data private.</p>
         </div>
 
-        {message && (
-          <div className="message" style={{ gridColumn: "1 / -1" }}>
-            {message}
-          </div>
-        )}
-        {error && (
-          <div className="message error" style={{ gridColumn: "1 / -1" }}>
-            {error}
-          </div>
-        )}
+        {message && <div className="message">{message}</div>}
+        {error && <div className="message error">{error}</div>}
       </form>
     </section>
   );

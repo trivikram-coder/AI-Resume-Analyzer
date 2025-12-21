@@ -36,15 +36,13 @@ export default function UploadResume() {
   return (
     <section className="panel">
       <div className="panel-header">
-        <div>
-          <p className="pill">AI analysis</p>
-          <h1 className="panel-title">Upload a resume to analyze</h1>
-          <p className="panel-subtitle">
-            We’ll parse your resume, score it against best practices, and
-            generate recruiter-friendly talking points you can copy into emails
-            or ATS portals.
-          </p>
-        </div>
+        <p className="pill">AI analysis</p>
+        <h1 className="panel-title">Upload a resume to analyze</h1>
+        <p className="panel-subtitle">
+          We'll parse your resume, score it against best practices, and
+          generate recruiter-friendly talking points you can copy into emails
+          or ATS portals.
+        </p>
       </div>
 
       <div className="grid-2">
@@ -57,8 +55,8 @@ export default function UploadResume() {
               accept=".pdf,.doc,.docx"
               onChange={(e) => setFile(e.target.files[0])}
             />
-            <p className="muted" style={{ marginTop: 8 }}>
-              {file ? `Selected: ${file.name}` : "Upload PDF or DOCX up to 5MB."}
+            <p className="muted" style={{ marginTop: 12 }}>
+              {file ? `✓ Selected: ${file.name}` : "📎 Upload PDF or DOCX up to 5MB"}
             </p>
           </div>
         </div>
@@ -76,7 +74,7 @@ export default function UploadResume() {
 
       <div className="actions">
         <button className="btn btn-primary" onClick={handleUpload} disabled={loading}>
-          {loading ? "Uploading..." : "Upload & Analyze"}
+          {loading ? "⏳ Uploading..." : "🚀 Upload & Analyze"}
         </button>
         <p className="muted">AI feedback returns in seconds. Stay on this page.</p>
       </div>
