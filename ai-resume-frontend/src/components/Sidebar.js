@@ -1,14 +1,33 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
-
-const menuItems = [
-  { to: "/", label: "Login", icon: "🔐" },
-  { to: "/register", label: "Register", icon: "👤" },
-  { to: "/upload", label: "Upload Resume", icon: "📄" },
-  { to: "/reports", label: "Reports", icon: "📊" },
-];
+import { NavLink, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
+  const location = useLocation();
+  const email = localStorage.getItem("email");
+  const isAuthPage = location.pathname === "/" || location.pathname === "/register";
+
+  // Main navigation items (always visible)
+  const mainMenuItems = [
+    { to: "/dashboard", label: "Dashboard", icon: "📊" },
+    { to: "/upload", label: "Upload Resume", icon: "📄" },
+    { to: "/reports", label: "Reports", icon: "📋" },
+  ];
+
+  // User-specific items (only when logged in)
+  const userMenuItems = email
+    ? [
+        { to: "/profile", label: "Profile", icon: "👤" },
+        { to: "/settings", label: "Settings", icon: "⚙️" },
+      ]
+    : [];
+
+  // Auth item (only when not logged in)
+  const authMenuItem = !email
+    ? [{ to: "/", label: "Login / Register", icon: "🔐" }]
+    : [];
+
+  const allMenuItems = [...mainMenuItems, ...userMenuItems, ...authMenuItem];
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -22,7 +41,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        {menuItems.map((item) => (
+        {allMenuItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

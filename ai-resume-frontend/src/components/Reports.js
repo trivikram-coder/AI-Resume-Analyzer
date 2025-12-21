@@ -25,7 +25,6 @@ export default function Reports() {
       try {
         setError("");
         const result = await getReports(email);
-        console.log("Reports API response:", result);
         
         // Handle different response formats
         if (result && result.status) {
