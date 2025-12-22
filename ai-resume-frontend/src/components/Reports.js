@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getReports, deleteReport } from "../api/api";
 
-function titleCase(str) {
-  if (!str) return "";
-  return str
-    .toLowerCase()
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
 export default function Reports() {
   const email = localStorage.getItem("email");
   const [reports, setReports] = useState([]);
@@ -21,25 +14,11 @@ export default function Reports() {
         setLoading(false);
         return;
       }
-
       try {
-        setError("");
-        const result = await getReports(email);
-        
-        // Handle different response formats
-        if (result && result.status) {
-          // Check if reports is an array or if data is in a different property
-          const reportsData = result.reports || result.data || (Array.isArray(result) ? result : []);
-          setReports(Array.isArray(reportsData) ? reportsData : []);
-        } else if (result && Array.isArray(result)) {
-          // Handle case where API returns array directly
-          setReports(result);
-        } else {
-          setError(result?.message || "Failed to load reports. Please try again.");
-        }
-      } catch (err) {
-        console.error("Error loading reports:", err);
-        setError("Unable to load reports. Please check your connection and try again.");
+        const res = await getReports(email);
+        setReports(res?.reports || res || []);
+      } catch {
+        setError("Unable to load reports.");
       } finally {
         setLoading(false);
       }
@@ -48,65 +27,193 @@ export default function Reports() {
   }, [email]);
 
   const remove = async (id) => {
-    try {
-      const result = await deleteReport(id);
-      if (result && result.status) {
-        setReports((current) => current.filter((r) => r.id !== id));
-      } else {
-        setError(result?.message || "Failed to delete report.");
-      }
-    } catch (err) {
-      console.error("Error deleting report:", err);
-      setError("Unable to delete report. Please try again.");
-    }
+    await deleteReport(id);
+    setReports((prev) => prev.filter((r) => r.id !== id));
   };
 
+  if (loading) return <div style={{ padding: 20 }}>⏳ Loading reports...</div>;
+  if (error) return <div style={{ padding: 20, color: "#b91c1c" }}>{error}</div>;
+
   return (
-    <section className="panel">
-      <div className="panel-header">
-        <p className="pill">Insights</p>
-        <h1 className="panel-title">Your AI-generated reports</h1>
-        <p className="panel-subtitle">
-          Every upload produces an actionable breakdown—ATS friendliness,
-          clarity, and recruiter-ready talking points.
+    <section style={{ padding: "24px" }}>
+      {/* HEADER */}
+      <div style={{ marginBottom: 24 }}>
+        <span style={{
+          fontSize: 12,
+          padding: "4px 10px",
+          borderRadius: 999,
+          background: "#eef2ff",
+          color: "#4f46e5",
+          fontWeight: 500
+        }}>
+          Insights
+        </span>
+
+        <h1 style={{ marginTop: 10, fontSize: 22 }}>
+          AI Resume Analysis Reports
+        </h1>
+
+        <p style={{ color: "#6b7280", fontSize: 14 }}>
+          ATS readiness, role fit, and skill-gap insights explained clearly.
         </p>
       </div>
 
-      {error && <div className="message error">{error}</div>}
-
-      {loading ? (
-        <div className="empty">⏳ Loading your reports...</div>
-      ) : !error && reports.length === 0 ? (
-        <div className="empty">
-          📭 No reports yet. Upload a resume to get AI suggestions.
+      {reports.length === 0 && (
+        <div style={{ color: "#6b7280" }}>
+          📭 No reports yet.
         </div>
-      ) : !error && reports.length > 0 ? (
-        <div className="report-grid">
-          {reports.map((r) => (
-            <article className="report-card styled" key={r.id}>
-              
-              {/* HEADER */}
-              <div className="report-meta">
-                <span className="pill" style={{ background: "rgba(139,92,246,0.12)", borderColor: "rgba(139,92,246,0.35)", color: "#c4b5fd" }}>
-                  Target role
+      )}
+
+      {/* GRID */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
+        gap: 20
+      }}>
+        {reports.map((r) => (
+          <article key={r.id} style={{
+            background: "#ffffff",
+            borderRadius: 14,
+            padding: "18px 20px",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.04)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 14
+          }}>
+
+            {/* META */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div style={{ display: "flex", gap: 8 }}>
+                <span style={{
+                  fontSize: 12,
+                  padding: "4px 10px",
+                  borderRadius: 999,
+                  background: "#eef2ff",
+                  color: "#4f46e5"
+                }}>
+                  ATS {r.atsScore}%
                 </span>
-                <button className="btn btn-secondary" onClick={() => remove(r.id)}>
-                  🗑️ Delete
-                </button>
-              </div>
-              <div>
-                <p className="muted" style={{ margin: "0 0 6px 0" }}>Description</p>
-                <div className="report-text">{r.description}</div>
-              </div>
-              <div>
-                <p className="muted" style={{ margin: "0 0 6px 0" }}>Report</p>
-                <div className="report-text">{r.generatedText}</div>
+
+                <span style={{
+                  fontSize: 12,
+                  padding: "4px 10px",
+                  borderRadius: 999,
+                  background: "#ecfeff",
+                  color: "#0369a1"
+                }}>
+                  Job Match {r.jobMatch}%
+                </span>
               </div>
 
-            </article>
-          ))}
-        </div>
-      ) : null}
+              <button
+                onClick={() => remove(r.id)}
+                title="Delete report"
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  opacity: 0.6,
+                  fontSize: 14
+                }}
+              >
+                🗑️
+              </button>
+            </div>
+
+            {/* SUMMARY */}
+            <p style={{
+              fontSize: 14,
+              color: "#4b5563",
+              lineHeight: 1.5
+            }}>
+              {r.summary}
+            </p>
+
+            {/* STRENGTHS */}
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600 }}>Strengths</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {r.strengths?.map((s, i) => (
+                  <span key={i} style={{
+                    fontSize: 12,
+                    padding: "4px 8px",
+                    borderRadius: 8,
+                    background: "#ecfdf5",
+                    color: "#047857"
+                  }}>
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* MISSING */}
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600 }}>Missing Keywords</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {r.missingKeywords<1?<span style={{
+                    fontSize: 12,
+                    padding: "4px 8px",
+                    borderRadius: 8,
+                    background: "#fef2f2",
+                    color: "#b91c1c"
+                  }}>No missing Keywords</span>:r.missingKeywords?.map((k, i) => (
+                  <span key={i} style={{
+                    fontSize: 12,
+                    padding: "4px 8px",
+                    borderRadius: 8,
+                    background: "#fef2f2",
+                    color: "#b91c1c"
+                  }}>
+                    {k}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* IMPROVEMENTS */}
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600 }}>
+                Recommended Improvements
+              </p>
+              <ul style={{
+                paddingLeft: 16,
+                fontSize: 13,
+                color: "#4b5563"
+              }}>
+                {r.improvements?.map((imp, i) => (
+                  <li key={i}>{imp}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* JOB ROLES */}
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600 }}>
+                Better-Fit Roles
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {r.jobRecommendation?.map((job, i) => (
+                  <span key={i} style={{
+                    fontSize: 12,
+                    padding: "4px 8px",
+                    borderRadius: 8,
+                    background: "#f1f5f9",
+                    color: "#334155"
+                  }}>
+                    {job}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
